@@ -1,0 +1,59 @@
+.ai-playground {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.playground-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.playground-header h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.playground-header p {
+    color: #7f8c8d;
+    font-size: 16px;
+}
+
+.tab-navigation {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 15px 25px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #7f8c8d;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+    color: #3498db;
+    background-color: #f8f9fa;
+}
+
+.tab-button.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    background-color: #f8f9fa;
+}
+
+.tab-content {
+    min-height: 600px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}

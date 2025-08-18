@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Image Upload</title>
+</head>
+<body>
+    <form action="http://localhost:8000/api/ai/analyze-image/" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <input type="text" name="context_text" placeholder="Context text">
+        <button type="submit">Analyze Image</button>
+    </form>
+</body>
+</html>

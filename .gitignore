@@ -1,0 +1,445 @@
+# ============================================================================
+# .gitignore for Django + React + AI Models Project
+# ============================================================================
+
+# ============================================================================
+# Python / Django
+# ============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Rope
+.ropeproject
+
+# mkdocs
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# ============================================================================
+# Django Specific
+# ============================================================================
+
+# Database
+*.sqlite3
+*.db
+
+# Media files (uploaded content)
+media/
+staticfiles/
+static/
+
+# Secret key and sensitive settings
+secrets.json
+.env
+.env.*
+
+# Migration files (optional - some prefer to commit these)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Django collected static files
+/static/
+/staticfiles/
+
+# ============================================================================
+# AI Models and Data
+# ============================================================================
+
+# Hugging Face cache directory
+.cache/
+cache/
+
+# PyTorch model files
+*.pth
+*.pt
+*.bin
+
+# TensorFlow model files
+*.h5
+*.pb
+saved_model/
+
+# Hugging Face models cache (can be very large!)
+transformers_cache/
+.transformers_cache/
+
+# Dataset files
+datasets/
+data/
+*.csv
+*.json
+*.jsonl
+*.parquet
+!sample_data/  # Keep sample data for testing
+
+# Large model files
+models/
+checkpoints/
+*.ckpt
+
+# Temporary AI processing files
+temp/
+tmp/
+processing/
+
+# Logs from AI training/inference
+logs/
+wandb/
+tensorboard_logs/
+
+# ============================================================================
+# Node.js / React / Vite
+# ============================================================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+
+# Environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite
+.vite/
+
+# Rollup
+.rollup.cache/
+
+# Parcel
+.parcel-cache/
+
+# Next.js
+.next/
+out/
+
+# Nuxt.js
+.nuxt/
+
+# Gatsby
+.cache/
+public/
+
+# Storybook
+.storybook/
+storybook-static/
+
+# Package manager locks (optional - some teams prefer to commit these)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ============================================================================
+# IDE and Editor files
+# ============================================================================
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# PyCharm
+.idea/
+*.swp
+*.swo
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*~
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================================================
+# Operating System
+# ============================================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# Cloud and Deployment
+# ============================================================================
+
+# AWS
+.aws/
+*.pem
+
+# Google Cloud
+.gcloud/
+service-account-key.json
+
+# Docker
+.dockerignore
+Dockerfile.prod
+
+# Kubernetes
+*.yaml
+*.yml
+!docker-compose.yml
+!docker-compose.yaml
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# ============================================================================
+# Project Specific
+# ============================================================================
+
+# API keys and secrets
+config/secrets.py
+.secrets
+api_keys.json
+
+# Large datasets
+data/large/
+datasets/raw/
+*.zip
+*.tar.gz
+*.rar
+
+# Generated documentation
+docs/build/
+site/
+
+# Testing artifacts
+test_results/
+coverage_reports/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Temporary uploads
+uploads/temp/
+temp_uploads/
+
+# AI model downloads (these can be re-downloaded)
+models/downloaded/
+pretrained_models/
+
+# Performance profiling
+*.prof
+profile_results/
+
+# ============================================================================
+# Security
+# ============================================================================
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+
+# SSL certificates
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# ============================================================================
+# Optional: Keep these commented out based on your team's preferences
+# ============================================================================
+
+# Database migrations (some teams prefer to commit these)
+# */migrations/
+
+# Lock files (some teams prefer to commit these for reproducible builds)
+# package-lock.json
+# yarn.lock
+# Pipfile.lock
+
+# Environment example files (you might want to keep these as templates)
+# !.env.example
+# !.env.template
