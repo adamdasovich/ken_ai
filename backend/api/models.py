@@ -28,7 +28,7 @@ class ConversationSession(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class ChatMessage(models.Model):
-    session_id = models.ForeignKey(ConversationSession, on_delete=models.CASCADE)
+    session = models.ForeignKey(ConversationSession, on_delete=models.CASCADE)
     message = models.TextField()
     response = models.TextField()
     sentiment_score = models.FloatField(null=True, blank=True)

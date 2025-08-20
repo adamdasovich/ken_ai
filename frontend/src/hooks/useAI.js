@@ -9,20 +9,37 @@ export const useImageAnalysis = () => {
     const analyzeImage = useCallback(async (imageFile, contextText = '') => {
         setLoading(true)
         setError(null)
+        setResult(null) // Clear previous results
+        
         try {
             const response = await aiService.analyzeImage(imageFile, contextText);
-            setResult(response);
+            console.log('API Response:', response); // Debug log
+            
+            // Validate the response structure
+            if (response && response.status === 'success' && response.analysis) {
+                setResult(response);
+            } else {
+                throw new Error(response?.error || 'Invalid response structure');
+            }
+            
             return response;
         }
         catch (err) {
+            console.error('Image analysis error:', err);
             setError(err.message);
+            setResult(null);
             throw err;
         } finally {
             setLoading(false)
         }
     }, [])
 
-    return { analyzeImage, loading, result, error}
+    const clearResult = useCallback(() => {
+        setResult(null);
+        setError(null);
+    }, []);
+
+    return { analyzeImage, loading, result, error, clearResult }
 };
 
 export const useChat = (sessionId) => {

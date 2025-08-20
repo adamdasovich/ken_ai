@@ -60,29 +60,31 @@ class AIServiceDebug {
     }
 }
 
-class AIService{
+class AIService {
     constructor() {
         this.baseURL = `${API_BASE_URL}/api`;
     }
 
     async analyzeImage(imageFile, contextText = '') {
-        const formData = new FormData()
+        const formData = new FormData();
         formData.append('image', imageFile);
         if (contextText) {
             formData.append('context_text', contextText);
         }
+        
         const response = await fetch(`${this.baseURL}/ai/analyze-image/`, {
-        method: 'POST',
-        body: formData
+            method: 'POST',
+            body: formData
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
-        return await response.json()
+        return await response.json();
     }
 
-    async sendChatMessage(sessionId, message){
+    async sendChatMessage(sessionId, message) {
         const response = await fetch(`${this.baseURL}/ai/chat/`, {
             method: 'POST',
             headers: {
@@ -92,24 +94,38 @@ class AIService{
                 session_id: sessionId,
                 message: message
             })
-        })
-        if(!response.ok){
-            throw new Error(`HTTP error! status: ${response.status}`)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
-        return await response.json()
+        return await response.json();
     }
 
     async getConversation(sessionId) {
         const response = await fetch(`${this.baseURL}/ai/conversation/${sessionId}/`);
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            if (response.status === 404) {
+                // Return empty conversation if not found
+                return {
+                    session_id: sessionId,
+                    messages: [],
+                    message_count: 0,
+                    context_summary: '',
+                    created_at: null
+                };
+            }
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
-        return await response.json()
+        return await response.json();
     }
 
-    async generatorContent(prompt, maxLength = 200) {
+    // FIXED: Method name and logic
+    async generateContent(prompt, maxLength = 200) {
         const response = await fetch(`${this.baseURL}/ai/generate-content/`, {
             method: 'POST',
             headers: {
@@ -119,15 +135,22 @@ class AIService{
                 prompt: prompt,
                 max_length: maxLength
             })
-        })
-        if (response.ok){
-            throw new Error(`HTTP error! status: ${response.status}`)
+        });
+        
+        // FIXED: Changed from 'if (response.ok)' to 'if (!response.ok)'
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
-        return await response.json()
+        return await response.json();
     }
 
-     async checkModelHealth() {
+    async checkModelHealth() {
         const response = await fetch(`${this.baseURL}/ai/health/`);
+        
+        if (!response.ok) {
+            throw new Error(`Health check failed: ${response.status}`);
+        }
         return await response.json();
     }
 
@@ -137,8 +160,23 @@ class AIService{
         params.append('limit', limit.toString());
 
         const response = await fetch(`${this.baseURL}/ai/results/?${params}`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to get model results: ${response.status}`);
+        }
         return await response.json();
     }
-    
+
+    // Additional useful methods
+    async getModelStatus() {
+        const response = await fetch(`${this.baseURL}/ai/model-status/`);
+        
+        if (!response.ok) {
+            throw new Error(`Model status failed: ${response.status}`);
+        }
+        return await response.json();
+    }
 }
-export const aiService = new AIService()
+
+export const aiService = new AIService();
+export const aiServiceDebug = new AIServiceDebug(); // For debugging

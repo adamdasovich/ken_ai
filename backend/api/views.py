@@ -1,3 +1,4 @@
+from .ai_services import model_manager, MultiModalAnalyzer, ConversationalAI, ContentGenerator
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
@@ -7,7 +8,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from .models import AIModelResult, ConversationSession, ChatMessage
 from .serializers import *
-from .ai_services import model_manager, MultiModalAnalyzer, ConversationalAI, ContentGenerator
+
 import uuid
 import os
 import json
@@ -21,24 +22,6 @@ import json
 from PIL import Image
 import io
 
-# Initialize services
-multimodal_analyzer = MultiModalAnalyzer(model_manager)
-conversational_ai = ConversationalAI(model_manager)
-content_generator = ContentGenerator(model_manager)
-
-from rest_framework.decorators import api_view, parser_classes
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from .models import AIModelResult, ConversationSession, ChatMessage
-from .serializers import *
-from .ai_services import model_manager, MultiModalAnalyzer, ConversationalAI, ContentGenerator
-import uuid
-import os
-import json
 
 # Initialize services
 multimodal_analyzer = MultiModalAnalyzer(model_manager)
@@ -56,13 +39,17 @@ def analyze_image(request):
     
     try:
         # Check if model manager is properly initialized
+        print(f"DEBUG: model_manager exists: {model_manager is not None}")
+        
         if model_manager is None:
             return Response({
                 'error': 'AI models are not loaded. Please check server logs.',
                 'status': 'error'
             }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         
-        if not hasattr(model_manager, 'models') or not model_manager.models:
+        print(f"DEBUG: model_manager has models attribute: {hasattr(model_manager, 'models')}")
+        
+        if not hasattr(model_manager, 'models'):
             return Response({
                 'error': 'AI models are not properly initialized.',
                 'status': 'error'
@@ -71,19 +58,25 @@ def analyze_image(request):
         image_file = serializer.validated_data['image']
         context_text = serializer.validated_data.get('context_text', '')
         
-        # Open image directly from uploaded file (no temp file needed)
-        from PIL import Image
-        import io
-        
-        # Reset file pointer and read image
+        # Open image directly from uploaded file
         image_file.seek(0)
         image = Image.open(io.BytesIO(image_file.read()))
         
-        # Analyze image directly without saving to disk
         start_time = time.time()
         
-        # Check if vision model is available
-        if 'vision' not in model_manager.models:
+        # Get vision model (this will trigger lazy loading)
+        print("DEBUG: Getting vision model...")
+        try:
+            vision_model = model_manager.get_model('vision')
+            print(f"DEBUG: Vision model loaded: {vision_model is not None}")
+        except Exception as model_error:
+            print(f"DEBUG: Error loading vision model: {model_error}")
+            return Response({
+                'error': f'Vision model failed to load: {str(model_error)}',
+                'status': 'error'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        if not vision_model:
             return Response({
                 'error': 'Vision model not available',
                 'available_models': list(model_manager.models.keys()),
@@ -91,36 +84,39 @@ def analyze_image(request):
             }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         
         # Image analysis
-        vision_results = model_manager.models['vision'](image)
+        print("DEBUG: Running vision model...")
+        vision_results = vision_model(image)
+        print(f"DEBUG: Vision results: {vision_results}")
         
         # Extract top predictions
-        top_predictions = vision_results[:3]
+        top_predictions = vision_results[:3] if vision_results else []
         image_labels = [pred['label'] for pred in top_predictions]
         
         # Context analysis if provided
         context_analysis = None
         if context_text:
-            if 'sentiment' in model_manager.models:
-                sentiment = model_manager.models['sentiment'](context_text)
-                context_analysis = {
-                    'sentiment': sentiment,
-                }
-                
-                # Add zero-shot classification if available
-                if 'zero_shot' in model_manager.models:
-                    context_analysis['categories'] = model_manager.models['zero_shot'](
-                        context_text, 
-                        candidate_labels=['technology', 'nature', 'business', 'personal', 'educational']
-                    )
+            # Try to get sentiment model
+            try:
+                sentiment_model = model_manager.get_model('sentiment')
+                if sentiment_model:
+                    sentiment = sentiment_model(context_text)
+                    context_analysis = {'sentiment': sentiment}
+            except Exception as e:
+                print(f"DEBUG: Sentiment analysis failed: {e}")
+                context_analysis = {'sentiment': {'label': 'NEUTRAL', 'score': 0.5}}
         
         # Generate embeddings if model is available
         embeddings = None
         combined_text = f"Image contains: {', '.join(image_labels)}"
         if context_text:
             combined_text += f" Context: {context_text}"
-            
-        if 'embeddings' in model_manager.models:
-            embeddings = model_manager.models['embeddings'].encode([combined_text])
+        
+        try:
+            embeddings_model = model_manager.get_model('embeddings')
+            if embeddings_model:
+                embeddings = embeddings_model.encode([combined_text])
+        except Exception as e:
+            print(f"DEBUG: Embeddings failed: {e}")
         
         processing_time = time.time() - start_time
         
@@ -144,7 +140,7 @@ def analyze_image(request):
                 'context': context_text
             }),
             result=result,
-            confidence_score=top_predictions[0]['score'],
+            confidence_score=top_predictions[0]['score'] if top_predictions else 0.0,
             processing_time=processing_time
         )
         
@@ -163,7 +159,7 @@ def analyze_image(request):
             'error': str(e),
             'status': 'error'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
 @api_view(['POST'])
 def chat_message(request):
     """Conversational AI endpoint"""
@@ -234,11 +230,25 @@ def chat_message(request):
 def get_conversation(request, session_id):
     """Get conversation history"""
     try:
-        session = get_object_or_404(ConversationSession, session_id=session_id)
+        session = ConversationSession.objects.get(session_id=session_id)
         serializer = ConversationSessionSerializer(session)
         return Response(serializer.data)
         
+    except ConversationSession.DoesNotExist:
+        # Return empty conversation instead of 404
+        return Response({
+            'session_id': session_id,
+            'context_summary': '',
+            'message_count': 0,
+            'created_at': None,
+            'messages': []
+        })
+        
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error in get_conversation: {error_details}")
+        
         return Response({
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -256,7 +266,7 @@ def generate_content(request):
         max_length = serializer.validated_data['max_length']
         
         # Generate content
-        
+
         result = content_generator.generate_safe_content(prompt, max_length)
         
         if 'error' in result:

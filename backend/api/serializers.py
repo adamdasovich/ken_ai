@@ -12,6 +12,7 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         fields = ['message', 'response', 'sentiment_score', 'timestamp']
 
 class ConversationSessionSerializer(serializers.ModelSerializer):
+    # Fixed: Use the correct related name based on your model field
     messages = ChatMessageSerializer(many=True, read_only=True, source='chatmessage_set')
     
     class Meta:
